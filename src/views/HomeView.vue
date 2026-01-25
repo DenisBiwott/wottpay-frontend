@@ -1,12 +1,8 @@
-<!-- Home Content -->
+<!-- Home View -->
 <template>
-  <div>
-    <h2 class="text-2xl font-semibold mb-4">Welcome to WottPay</h2>
-    <p class="text-gray-700">
-      This is the home view. Use the sidebar to navigate through different sections of the
-      application.
-    </p>
-  </div>
+  <HomeContent />
 </template>
-<script lang="ts"></script>
-<style scoped></style>
+
+<script setup lang="ts">
+import { HomeContent } from '@/features/home/components'
+</script>

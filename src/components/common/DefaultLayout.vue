@@ -1,33 +1,43 @@
-<!-- Default home layout with sidebar, topbar & content: It should be mobile responsive -->
+<!-- Default home layout with sidebar, topbar & content: Mobile responsive -->
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen bg-gray-50">
     <!-- Topbar -->
-    <header class="bg-white shadow-md">
-      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <h1 class="text-xl font-bold">WottPay</h1>
-        <!-- Add topbar content here -->
-      </div>
-    </header>
+    <Topbar :is-mobile-menu-open="isMobileMenuOpen" @toggle-menu="toggleMobileMenu" />
 
-    <div class="flex flex-1">
+    <div class="flex">
+      <!-- Mobile overlay backdrop -->
+      <Transition
+        enter-active-class="transition-opacity ease-linear duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity ease-linear duration-300"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="isMobileMenuOpen"
+          class="fixed inset-0 bg-gray-600 bg-opacity-50 z-30 md:hidden"
+          @click="closeMobileMenu"
+        ></div>
+      </Transition>
+
       <!-- Sidebar -->
-      <aside class="w-64 bg-gray-100 p-4 hidden md:block">
-        <nav>
-          <ul>
-            <li class="mb-2">
-              <a href="#" class="text-gray-700 hover:text-gray-900">Home</a>
-            </li>
-            <li class="mb-2"><a href="#" class="text-gray-700 hover:text-gray-900">Payments</a></li>
-            <li class="mb-2"><a href="#" class="text-gray-700 hover:text-gray-900">Settings</a></li>
-            <!-- Add more sidebar links here -->
-          </ul>
-        </nav>
-      </aside>
+      <Sidebar :is-open="isMobileMenuOpen" :business-name="businessName" />
 
       <!-- Main Content Area -->
-      <main class="flex-1 p-6 bg-white">
-        <slot></slot>
+      <main class="flex-1 min-h-[calc(100vh-4rem)] md:ml-0">
+        <div class="p-4 sm:p-6 lg:p-8">
+          <slot></slot>
+        </div>
       </main>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { Topbar, Sidebar } from '@/components/layout'
+import { useLayout, useUserProfile } from '@/composables'
+
+const { isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } = useLayout()
+const { businessName } = useUserProfile()
+</script>
