@@ -20,9 +20,9 @@ export function useLogin() {
         password: password.value,
       })
 
+      // If TOTP is required, redirect to verification page
       if (response.requiresTotp) {
-        // TODO: Redirect to TOTP verification page
-        router.push({ name: 'home' })
+        router.push({ name: 'totp-verification' })
         return
       }
 

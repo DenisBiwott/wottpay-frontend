@@ -1,5 +1,6 @@
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
+import TotpVerificationView from '@/views/TotpVerificationView.vue'
 import PaymentView from '@/views/PaymentView.vue'
 import TransasctionsView from '@/views/TransasctionsView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -13,6 +14,15 @@ const routes = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
+    },
+  },
+  {
+    path: '/verify',
+    name: 'totp-verification',
+    component: TotpVerificationView,
+    meta: {
+      layout: 'AuthLayout',
+      requiresAuth: false,
     },
   },
   {
@@ -45,7 +55,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 })
 

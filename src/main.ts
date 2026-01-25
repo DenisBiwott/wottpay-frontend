@@ -5,16 +5,15 @@ import '@/style.css'
 
 import App from './App.vue'
 import router from './router'
-import { useAuthStore } from '@/features/auth/store/auth.store'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 const app = createApp(App)
+
+// Pinia store setup
 const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 
 app.use(pinia)
 app.use(router)
-
-// Initialize auth state from localStorage before mounting
-const authStore = useAuthStore()
-authStore.initializeFromStorage()
 
 app.mount('#app')

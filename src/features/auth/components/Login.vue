@@ -47,7 +47,7 @@
           </div>
 
           <!-- Submit Button -->
-          <Button type="submit" :loading="isLoading()" full-width size="lg">
+          <Button type="submit" :loading="isLoading()" full-width size="md">
             {{ isLoading() ? 'Logging in...' : 'Log In' }}
           </Button>
         </form>

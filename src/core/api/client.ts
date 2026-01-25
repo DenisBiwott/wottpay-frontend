@@ -1,6 +1,7 @@
 // Central Axios instance + Interceptors
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import type { RefreshTokenResponse } from '@/features/auth/types/auth.types'
+import { useAuthStore } from '@/features/auth/store/auth.store'
 
 // Create axios instance
 const apiClient = axios.create({
@@ -31,7 +32,8 @@ const processQueue = (error: unknown, token: string | null = null) => {
 // Request interceptor - attach Bearer token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const accessToken = localStorage.getItem('accessToken')
+    const authStore = useAuthStore()
+    const accessToken = authStore.accessToken
     if (accessToken && config.headers) {
       config.headers.Authorization = `Bearer ${accessToken}`
     }
@@ -86,7 +88,8 @@ apiClient.interceptors.response.use(
     originalRequest._retry = true
     isRefreshing = true
 
-    const refreshToken = localStorage.getItem('refreshToken')
+    const authStore = useAuthStore()
+    const refreshToken = authStore.refreshToken
 
     if (!refreshToken) {
       isRefreshing = false
@@ -103,9 +106,6 @@ apiClient.interceptors.response.use(
       )
 
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data
-
-      localStorage.setItem('accessToken', newAccessToken)
-      localStorage.setItem('refreshToken', newRefreshToken)
 
       if (originalRequest.headers) {
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
@@ -126,9 +126,8 @@ apiClient.interceptors.response.use(
 )
 
 function clearAuthData() {
-  localStorage.removeItem('accessToken')
-  localStorage.removeItem('refreshToken')
-  localStorage.removeItem('user')
+  const authStore = useAuthStore()
+  authStore.clearAuthState()
 }
 
 export default apiClient
