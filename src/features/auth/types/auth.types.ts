@@ -4,7 +4,15 @@ export interface User {
   id: string
   email: string
   role: string
-  totpVerified?: boolean
+  businessId: string
+  business: Business
+  isTotpEnabled: boolean
+}
+
+// Business
+export interface Business {
+  id: string
+  name: string
 }
 
 export interface LoginCredentials {
