@@ -23,7 +23,7 @@
         <!-- Profile header -->
         <div class="px-4 py-3 border-b border-gray-100">
           <p class="text-sm font-medium text-gray-900 truncate">{{ userEmail }}</p>
-          <p class="text-xs text-gray-500 truncate">{{ businessName }}</p>
+          <p class="text-xs text-gray-500 truncate">{{ userRole }}</p>
         </div>
 
         <!-- Menu items -->
@@ -69,7 +69,7 @@ defineEmits<{
   'toggle-menu': []
 }>()
 
-const { userInitials, userEmail, businessName, handleLogout } = useUserProfile()
+const { userInitials, userEmail, userRole, businessName, handleLogout } = useUserProfile()
 
 function navigateToProfile() {
   // TODO: Implement profile navigation
