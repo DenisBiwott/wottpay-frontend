@@ -12,9 +12,8 @@ export function getGreeting(name: string = '') {
 
   const isMidnightOil = hour === 2 && minute >= 50 && minute < 60
   if (isMidnightOil) {
-    return `Rest, ${name} 👋`
+    return `Take a rest${name ? `, ${name}` : ''} 👋`
   }
 
-  // Combine everything
-  return `${timeGreeting}, ${name} 👋`
+  return `${timeGreeting}${name ? `, ${name}` : ''} 👋`
 }

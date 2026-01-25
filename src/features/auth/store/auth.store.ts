@@ -9,6 +9,7 @@ import type {
   TotpVerifyResponse,
 } from '@/features/auth/types/auth.types'
 import {
+  fetchUserProfileApi,
   loginApi,
   logoutApi,
   refreshTokenApi,
@@ -142,6 +143,13 @@ export const useAuthStore = defineStore(
       }
     }
 
+    // Set user details using fetched profile data
+    async function fetchAndSetUserProfile(): Promise<User | null> {
+      const data = await fetchUserProfileApi()
+      user.value = data
+      return data
+    }
+
     function clearAuthState(): void {
       user.value = null
       accessToken.value = null
@@ -166,6 +174,7 @@ export const useAuthStore = defineStore(
       verifyTotp,
       refreshAccessToken,
       clearAuthState,
+      fetchAndSetUserProfile,
     }
   },
 
