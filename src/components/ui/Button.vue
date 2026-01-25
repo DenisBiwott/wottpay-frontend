@@ -59,9 +59,9 @@ const props = withDefaults(
 
 const sizeClasses = computed(() => {
   const sizes = {
-    sm: 'px-3 py-1.5 text-sm rounded-md',
-    md: 'px-4 py-2.5 text-base rounded-lg',
-    lg: 'px-6 py-3 text-lg rounded-lg',
+    sm: 'px-3 py-1.5 text-sm rounded-full',
+    md: 'px-4 py-2.5 text-base rounded-full',
+    lg: 'px-6 py-3 text-lg rounded-full',
   }
   return sizes[props.size]
 })
