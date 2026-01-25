@@ -10,6 +10,8 @@ export function useUserProfile() {
 
   const userEmail = computed(() => user.value?.email ?? '')
 
+  const userRole = computed(() => user.value?.role ?? '')
+
   const businessName = computed(() => user.value?.business?.name ?? '')
 
   const userInitials = computed(() => {
@@ -44,6 +46,7 @@ export function useUserProfile() {
   return {
     user,
     userEmail,
+    userRole,
     businessName,
     userInitials,
     firstName,

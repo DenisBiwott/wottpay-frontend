@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out',
+      'fixed inset-y-0 left-0 z-40 w-64 min-w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out',
       'md:translate-x-0 md:static md:inset-auto',
       isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
