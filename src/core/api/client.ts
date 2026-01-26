@@ -8,6 +8,8 @@ const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   headers: {
     'Content-Type': 'application/json',
+    // Ngrok specific header to avoid warning page
+    'ngrok-skip-browser-warning': 'true',
   },
 })
 

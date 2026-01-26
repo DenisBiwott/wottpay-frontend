@@ -1,31 +1,41 @@
 <template>
   <Table>
     <template #header>
+      <TableCell is-header>Date</TableCell>
+      <TableCell is-header>Description</TableCell>
       <TableCell is-header>Reference</TableCell>
       <TableCell is-header>Amount</TableCell>
       <TableCell is-header>Currency</TableCell>
-      <TableCell is-header>Date</TableCell>
+
       <TableCell is-header>Status</TableCell>
-      <TableCell is-header>Description</TableCell>
+
       <TableCell is-header align="right">Actions</TableCell>
     </template>
 
     <template #body>
       <TableRow v-for="request in paymentRequests" :key="request.id">
-        <TableCell>{{ request.merchantRef }}</TableCell>
+        <TableCell
+          ><span>{{ humanReadableDate(request.createdAt) }}</span></TableCell
+        >
+        <TableCell>
+          <span class="max-w-50 truncate block">
+            {{ request.description || '-' }}
+          </span>
+        </TableCell>
+        <TableCell>
+          <span class="max-w-30 truncate block">
+            {{ request.merchantRef }}
+          </span>
+        </TableCell>
         <TableCell>{{ formatCurrency(request.amount, request.currency) }}</TableCell>
         <TableCell>{{ request.currency }}</TableCell>
-        <TableCell>{{ humanReadableDate(request.createdAt) }}</TableCell>
+
         <TableCell>
           <Badge :variant="getStatusVariant(request.status)">
             {{ request.status }}
           </Badge>
         </TableCell>
-        <TableCell>
-          <span class="max-w-[200px] truncate block">
-            {{ request.description || '-' }}
-          </span>
-        </TableCell>
+
         <TableCell align="right">
           <PaymentRequestActions
             :redirect-url="request.redirectUrl"
@@ -63,7 +73,9 @@ import type { PaymentRequest, PaymentRequestStatus } from '../types/paymentReque
 defineProps<{
   paymentRequests: PaymentRequest[]
   isCancelling: boolean
-  getStatusVariant: (status: PaymentRequestStatus) => 'success' | 'warning' | 'error' | 'info' | 'default'
+  getStatusVariant: (
+    status: PaymentRequestStatus,
+  ) => 'success' | 'warning' | 'error' | 'info' | 'default'
   canCancel: (status: PaymentRequestStatus) => boolean
   copyPaymentUrl: (url: string) => void
   cancelRequest: (trackingId: string) => void

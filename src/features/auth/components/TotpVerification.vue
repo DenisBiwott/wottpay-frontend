@@ -57,8 +57,8 @@
           </Button>
         </form>
 
-        <!-- Resend Link -->
-        <div class="mt-6 text-center">
+        <!-- Resend Link: Useful for not TOTP auth -->
+        <div v-if="false" class="mt-6 text-center">
           <p class="text-gray-500 text-sm">
             Didn't receive a code?
             <button
