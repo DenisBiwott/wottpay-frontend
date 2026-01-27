@@ -62,6 +62,9 @@
         />
       </div>
     </section>
+
+    <!-- Recent Activity -->
+    <RecentActivityTable />
   </div>
 </template>
 
@@ -76,6 +79,7 @@ import { useInsights } from '../composables/useInsights'
 import { Alert, Loader } from '@/components/ui'
 import QuickActionButton from './QuickActionButton.vue'
 import OverviewCard from './OverviewCard.vue'
+import RecentActivityTable from './RecentActivityTable.vue'
 import BankNotesOutline from '@/components/icons/BankNotesOutline.vue'
 import PaperPlaneOutline from '@/components/icons/PaperPlaneOutline.vue'
 import { useToast } from '@/core/composables/useToast'

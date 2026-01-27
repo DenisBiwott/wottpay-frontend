@@ -7,9 +7,6 @@
     ]"
   >
     <div class="flex flex-col h-full">
-      <!-- Business Switcher -->
-      <!-- <BusinessSwitcher :business-name="businessName" /> -->
-
       <!-- Navigation -->
       <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <SidebarNavItem :to="{ name: 'home' }" label="Home">

@@ -8,7 +8,7 @@
         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
     ]"
   >
-    <span class="w-5 h-5 flex-shrink-0">
+    <span class="w-5 h-5 shrink-0">
       <slot name="icon"></slot>
     </span>
     <span>{{ label }}</span>

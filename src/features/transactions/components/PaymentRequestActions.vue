@@ -1,5 +1,5 @@
 <template>
-  <Dropdown ref="dropdownRef" align="right" width="w-44">
+  <Dropdown ref="dropdownRef" align="right" width="w-52">
     <template #trigger>
       <button
         type="button"
@@ -8,6 +8,13 @@
         <EllipsisVerticalIcon class="w-5 h-5 text-gray-500" />
       </button>
     </template>
+
+    <DropdownItem v-if="isCompleted" @click="handleViewDetails">
+      <template #icon>
+        <EyeIcon class="w-4 h-4" />
+      </template>
+      View Transaction
+    </DropdownItem>
 
     <DropdownItem @click="handleCopyUrl">
       <template #icon>
@@ -28,17 +35,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Dropdown, DropdownItem } from '@/components/ui'
-import { EllipsisVerticalIcon, CopyIcon, BanIcon } from '@/components/icons'
+import { EllipsisVerticalIcon, CopyIcon, BanIcon, EyeIcon } from '@/components/icons'
 
 defineProps<{
   redirectUrl: string
   canCancel: boolean
   isCancelling: boolean
+  isCompleted: boolean
+  paymentRequestId: string
 }>()
 
 const emit = defineEmits<{
   copyUrl: []
   cancel: []
+  viewDetails: [paymentRequestId: string]
 }>()
 
 const dropdownRef = ref<InstanceType<typeof Dropdown> | null>(null)
@@ -50,6 +60,11 @@ function handleCopyUrl() {
 
 function handleCancel() {
   emit('cancel')
+  dropdownRef.value?.close()
+}
+
+function handleViewDetails() {
+  emit('viewDetails', '')
   dropdownRef.value?.close()
 }
 </script>

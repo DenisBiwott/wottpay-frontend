@@ -1,27 +1,175 @@
 <template>
-  <div class="py-8">
-    <div class="text-center">
-      <div class="mx-auto h-12 w-12 text-gray-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z"
-          />
-        </svg>
+  <div class="py-6 space-y-8">
+    <!-- Profile Section -->
+    <section>
+      <h3 class="text-lg text-gray-900 mb-4">Profile Information</h3>
+      <div class="bg-white border border-slate-200 rounded-lg p-4 space-y-4">
+        <div class="flex items-center justify-between py-2 border-b border-gray-200">
+          <span class="text-sm text-gray-500">Email</span>
+          <span class="text-sm text-gray-900">{{ userEmail }}</span>
+        </div>
+        <div class="flex items-center justify-between py-2 border-b border-gray-200">
+          <span class="text-sm text-gray-500">Role</span>
+          <span class="text-sm text-gray-900">{{ splitVariables(userRole, '_') }}</span>
+        </div>
+        <div class="flex items-center justify-between py-2">
+          <span class="text-sm text-gray-500">Business</span>
+          <span class="text-sm text-gray-900">{{ businessName }}</span>
+        </div>
       </div>
-      <h3 class="mt-4 text-lg font-medium text-gray-900">User Settings</h3>
-      <p class="mt-2 text-sm text-gray-500">
-        User profile and preferences are under development. Check back soon.
-      </p>
-    </div>
+    </section>
+
+    <!-- Two-Factor Authentication Section -->
+    <section>
+      <h3 class="text-lg text-gray-900 mb-4">Two-Factor Authentication</h3>
+
+      <!-- Error State -->
+      <Alert v-if="error" variant="error" class="mb-4">
+        {{ error }}
+        <button @click="clearError" class="ml-2 underline">Dismiss</button>
+      </Alert>
+
+      <!-- Idle State - Show current status and action button -->
+      <div v-if="currentStep === 'idle'" class="bg-gray-50 rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-start gap-3">
+            <ShieldCheck
+              class="w-5 h-5"
+              :class="isTotpEnabled ? 'text-green-500' : 'text-gray-400'"
+            />
+            <div>
+              <p class="text-sm text-gray-900">
+                {{ isTotpEnabled ? 'Enabled' : 'Disabled' }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{
+                  isTotpEnabled
+                    ? 'Your account is protected with 2FA'
+                    : 'Add an extra layer of security to your account'
+                }}
+              </p>
+            </div>
+          </div>
+
+          <Button v-if="isTotpEnabled" variant="secondary" @click="startDisableFlow" size="sm">
+            Disable
+          </Button>
+          <Button v-else @click="startEnableFlow" size="sm">Enable</Button>
+        </div>
+      </div>
+
+      <!-- Setup Step - Initial enable flow -->
+      <div
+        v-else-if="currentStep === 'setup'"
+        class="bg-white border border-slate-200 rounded-lg p-6"
+      >
+        <h4 class="text-base text-gray-900 mb-2">Enable Two-Factor Authentication</h4>
+        <p class="text-sm text-gray-500 mb-6">
+          You'll need an authenticator app like Google Authenticator or Authy to complete this
+          setup.
+        </p>
+        <div class="flex gap-3">
+          <Button size="sm" @click="initiateTotpSetup" :loading="isLoading" :disabled="isLoading">
+            Continue Setup
+          </Button>
+          <Button size="sm" variant="secondary" @click="cancelFlow" :disabled="isLoading">
+            Cancel
+          </Button>
+        </div>
+      </div>
+
+      <!-- Verify Step - Show QR code and verification input -->
+      <div
+        v-else-if="currentStep === 'verify'"
+        class="bg-white border border-slate-200 rounded-lg p-6"
+      >
+        <h4 class="text-base text-gray-900 mb-2">Scan QR Code</h4>
+        <p class="text-sm text-gray-500 mb-6">
+          Scan this QR code with your authenticator app, then enter the verification code below.
+        </p>
+
+        <div class="flex flex-col items-center mb-6">
+          <!-- QR Code -->
+          <div v-if="qrCodeUrl" class="mb-4 p-4 bg-white rounded-lg border border-gray-200">
+            <img :src="qrCodeUrl" alt="TOTP QR Code" class="w-48 h-48" />
+          </div>
+
+          <!-- Manual Secret -->
+          <div v-if="secret" class="text-center">
+            <p class="text-xs text-gray-500 mb-1">Or enter this code manually:</p>
+            <code class="px-3 py-1 bg-gray-100 rounded text-sm font-mono select-all">{{
+              secret
+            }}</code>
+          </div>
+        </div>
+
+        <!-- Verification Code Input -->
+        <div class="mb-6">
+          <CodeInput v-model="verificationCode" @complete="onCodeComplete" :disabled="isLoading" />
+        </div>
+
+        <div class="flex gap-3">
+          <Button size="sm" variant="secondary" @click="cancelFlow" :disabled="isLoading">
+            Cancel
+          </Button>
+        </div>
+      </div>
+
+      <!-- Disable Step - Confirm with code -->
+      <div v-else-if="currentStep === 'disable'" class="bg-gray-50 rounded-lg p-6">
+        <h4 class="text-base font-medium text-gray-900 mb-2">Disable Two-Factor Authentication</h4>
+        <p class="text-sm text-gray-500 mb-6">
+          Enter a code from your authenticator app to confirm disabling 2FA.
+        </p>
+
+        <!-- Verification Code Input -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
+          <CodeInput v-model="disableCode" @complete="onCodeComplete" :disabled="isLoading" />
+        </div>
+
+        <div class="flex gap-3">
+          <Button size="sm" variant="secondary" @click="cancelFlow" :disabled="isLoading">
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { Alert, Button, CodeInput } from '@/components/ui'
+import { ShieldCheck } from '@/components/icons'
+import { useAuthStore } from '@/features/auth/store/auth.store'
+import { useTotpSettings } from '../composables/useTotpSettings'
+import { splitVariables } from '@/core/utils/formatting'
+
+const authStore = useAuthStore()
+
+// Profile information
+const userEmail = computed(() => authStore.user?.email || 'Unknown')
+const userRole = computed(() => authStore.user?.role || 'Unknown')
+const businessName = computed(() => authStore.user?.business?.name || 'Unknown')
+
+// TOTP settings
+const {
+  currentStep,
+  isLoading,
+  error,
+  secret,
+  qrCodeUrl,
+  verificationCode,
+  isTotpEnabled,
+  startEnableFlow,
+  startDisableFlow,
+  cancelFlow,
+  initiateTotpSetup,
+  clearError,
+  onCodeComplete,
+} = useTotpSettings()
+
+// Separate ref for disable flow
+const disableCode = verificationCode
+</script>

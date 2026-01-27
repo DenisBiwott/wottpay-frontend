@@ -30,3 +30,17 @@ export interface CancelPaymentResponse {
   status: string
   message: string
 }
+
+export interface PaymentRequestTransaction {
+  paymentMethod: string
+  confirmationCode: string
+  statusMessage: string
+  amount: number
+  currency: string
+  createdAt: string
+  paymentAccount: string
+}
+
+export interface PaymentRequestWithTransaction extends PaymentRequest {
+  transaction?: PaymentRequestTransaction
+}
