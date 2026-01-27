@@ -40,8 +40,8 @@ export function useUserProfile() {
     return namePart.charAt(0).toUpperCase() + namePart.slice(1)
   })
 
-  function handleLogout() {
-    authStore.logout()
+  async function handleLogout() {
+    await authStore.logout()
     router.push({ name: 'login' })
   }
 
