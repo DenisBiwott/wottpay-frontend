@@ -32,7 +32,7 @@
           <div
             v-for="activity in recentActivities"
             :key="activity.id"
-            class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+            class="bg-white border border-gray-200 rounded-lg p-4 mt-2 shadow-sm"
           >
             <div class="space-y-2">
               <div class="flex justify-between">
@@ -47,7 +47,9 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">Action</span>
-                <span class="text-sm text-gray-900">{{ activity.action }}</span>
+                <span class="text-xs text-gray-900">{{
+                  splitVariables(activity.action, '_')
+                }}</span>
               </div>
             </div>
           </div>
