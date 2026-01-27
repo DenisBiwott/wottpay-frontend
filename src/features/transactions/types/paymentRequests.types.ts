@@ -1,4 +1,4 @@
-export type PaymentRequestStatus = 'COMPLETED' | 'PENDING' | 'FAILED' | 'CANCELLED' | 'EXPIRED'
+export type PaymentRequestStatus = 'ACTIVE' | 'COMPLETED' | 'FAILED' | 'RECALLED' | 'CANCELLED'
 
 export interface PaymentRequest {
   id: string
@@ -12,6 +12,12 @@ export interface PaymentRequest {
   description: string
   callbackUrl: string
   createdAt: string
+}
+
+export interface PaymentRequestFilters {
+  status?: PaymentRequestStatus
+  startDate?: string
+  endDate?: string
 }
 
 export interface CancelPaymentRequest {

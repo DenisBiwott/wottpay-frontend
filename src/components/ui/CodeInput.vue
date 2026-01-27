@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center gap-2 sm:gap-3">
+  <div class="flex justify-center gap-1.5 sm:gap-1.5">
     <input
       v-for="(_, index) in length"
       :key="index"
@@ -14,7 +14,7 @@
       @paste="handlePaste"
       @focus="handleFocus(index)"
       :class="[
-        'w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-light',
+        'w-8 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-light',
         'border rounded-lg outline-none transition-all duration-200',
         'focus:border-primary focus:ring-2 focus:ring-primary/20',
         disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white',

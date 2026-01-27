@@ -1,5 +1,13 @@
 <template>
   <div class="mt-6">
+    <!-- Filters -->
+    <PaymentRequestFilters
+      :filters="filters"
+      :has-active-filters="hasActiveFilters"
+      @update:filters="applyFilters"
+      @clear="clearFilters"
+    />
+
     <!-- Error State -->
     <Alert v-if="error" variant="error" class="mb-4">
       {{ error }}
@@ -7,9 +15,7 @@
     </Alert>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
+    <Loader v-if="isLoading" />
 
     <!-- Empty State -->
     <div v-else-if="isEmpty" class="text-center py-12">
@@ -29,7 +35,9 @@
         </svg>
       </div>
       <h3 class="mt-2 text-sm font-medium text-gray-900">No payment requests</h3>
-      <p class="mt-1 text-sm text-gray-500">Get started by creating a new payment request.</p>
+      <p class="mt-1 text-sm text-gray-500">
+        {{ hasActiveFilters ? 'No payment requests match your filters.' : 'Get started by creating a new payment request.' }}
+      </p>
     </div>
 
     <!-- Table -->
@@ -46,8 +54,9 @@
 </template>
 
 <script setup lang="ts">
-import { Alert } from '@/components/ui'
+import { Alert, Loader } from '@/components/ui'
 import PaymentRequestsTable from './PaymentRequestsTable.vue'
+import PaymentRequestFilters from './PaymentRequestFilters.vue'
 import { usePaymentRequests } from '../composables/usePaymentRequests'
 
 const {
@@ -56,6 +65,10 @@ const {
   error,
   isCancelling,
   isEmpty,
+  filters,
+  hasActiveFilters,
+  applyFilters,
+  clearFilters,
   cancelRequest,
   copyPaymentUrl,
   getStatusVariant,

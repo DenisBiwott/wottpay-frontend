@@ -8,7 +8,12 @@
     <!-- Quick Actions -->
     <section>
       <div class="flex flex-nowrap overflow-x-auto space-x-4 h-8 hidden-scrollbar">
-        <QuickActionButton label="Request" variant="primary" @click="handleRequest">
+        <QuickActionButton
+          v-if="canCreatePayment"
+          label="Request"
+          variant="primary"
+          @click="handleRequest"
+        >
           <template #icon>
             <BankNotesOutline class="h-4 w-4" />
           </template>
@@ -30,7 +35,17 @@
 
     <!-- Insights Cards -->
     <section>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
+      <!-- Loading State -->
+      <Loader v-if="isLoading" container-class="py-8" />
+
+      <!-- Error State -->
+      <Alert v-else-if="error" variant="error" class="mb-4">
+        {{ error }}
+        <button @click="clearError" class="ml-2 underline">Dismiss</button>
+      </Alert>
+
+      <!-- Insights Cards -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
         <OverviewCard
           title="Pending Requests"
           :value="pendingRequests"
@@ -51,11 +66,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { TransferIcon } from '@/components/icons'
 import { getGreeting } from '@/core/utils/greeting'
 import { useUserProfile } from '@/composables'
+import { useRbac } from '@/core/rbac'
+import { useInsights } from '../composables/useInsights'
+import { Alert, Loader } from '@/components/ui'
 import QuickActionButton from './QuickActionButton.vue'
 import OverviewCard from './OverviewCard.vue'
 import BankNotesOutline from '@/components/icons/BankNotesOutline.vue'
@@ -64,27 +82,23 @@ import { useToast } from '@/core/composables/useToast'
 
 const router = useRouter()
 const { firstName } = useUserProfile()
+const { canCreatePayment } = useRbac()
+const { pendingRequests, paidRequests, amountReceived, isLoading, error, clearError } =
+  useInsights()
 
 const greeting = computed(() => getGreeting(firstName.value))
-
-// TODO: Replace with actual data from store/API
-const pendingRequests = ref(12)
-const paidRequests = ref(48)
-const amountReceived = ref(125000)
 
 function handleRequest() {
   router.push({ name: 'payment' })
 }
 
 function handlePay() {
-  // TODO: Implement pay action
   const toast = useToast()
-  toast.success('Pay functionality is still under development. 🛠️')
+  toast.success('Pay functionality is still under development.')
 }
 
 function handleTransfer() {
-  // TODO: Implement transfer action
   const toast = useToast()
-  toast.success('Transfer functionality is still under development. 🛠️')
+  toast.success('Transfer functionality is still under development.')
 }
 </script>

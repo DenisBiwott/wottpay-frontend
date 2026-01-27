@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { PaymentRequest, CancelPaymentResponse } from '../types/paymentRequests.types'
+import type {
+  PaymentRequest,
+  PaymentRequestFilters,
+  CancelPaymentResponse,
+} from '../types/paymentRequests.types'
 import {
   fetchPaymentRequestsApi,
   cancelPaymentRequestApi,
@@ -13,14 +17,22 @@ export const usePaymentRequestsStore = defineStore('paymentRequests', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const isCancelling = ref(false)
+  const filters = ref<PaymentRequestFilters>({})
 
   // Actions
-  async function fetchPaymentRequests(businessId: string): Promise<PaymentRequest[]> {
+  async function fetchPaymentRequests(
+    filterParams?: PaymentRequestFilters,
+  ): Promise<PaymentRequest[]> {
     isLoading.value = true
     error.value = null
 
+    // Store filters for future reference
+    if (filterParams) {
+      filters.value = filterParams
+    }
+
     try {
-      const data = await fetchPaymentRequestsApi(businessId)
+      const data = await fetchPaymentRequestsApi(filterParams)
       paymentRequests.value = data
       return data
     } catch (err) {
@@ -74,6 +86,14 @@ export const usePaymentRequestsStore = defineStore('paymentRequests', () => {
     }
   }
 
+  function setFilters(newFilters: PaymentRequestFilters) {
+    filters.value = newFilters
+  }
+
+  function clearFilters() {
+    filters.value = {}
+  }
+
   function clearError() {
     error.value = null
   }
@@ -84,9 +104,12 @@ export const usePaymentRequestsStore = defineStore('paymentRequests', () => {
     isLoading,
     error,
     isCancelling,
+    filters,
     // Actions
     fetchPaymentRequests,
     cancelPaymentRequest,
+    setFilters,
+    clearFilters,
     clearError,
   }
 })
