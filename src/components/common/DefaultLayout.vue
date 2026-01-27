@@ -22,13 +22,13 @@
       </Transition>
 
       <!-- Sidebar -->
-      <Sidebar :is-open="isMobileMenuOpen" :business-name="businessName" />
+      <Sidebar :is-open="isMobileMenuOpen" :business-name="businessName" class="mt-16 md:mt-0" />
 
       <!-- Main Content Area -->
       <main class="flex-1 min-h-[calc(100vh-4rem)] md:ml-0 overflow-hidden">
         <div class="p-4 sm:p-6 lg:p-8">
           <div class="w-full overflow-x-auto">
-            <slot />
+            <slot></slot>
           </div>
         </div>
       </main>

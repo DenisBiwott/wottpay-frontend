@@ -21,7 +21,7 @@
       @focus="isFocused = true"
       @blur="isFocused = false"
       :class="[
-        'w-full px-3 py-3 border rounded-lg outline-none transition-colors',
+        'w-full px-3 py-2 border rounded-lg outline-none transition-colors',
         hasToggle ? 'pr-10' : '',
         isFocused ? 'border-primary ring-1 ring-primary' : 'border-gray-300',
         disabled ? 'bg-gray-100 cursor-not-allowed' : '',

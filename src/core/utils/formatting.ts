@@ -78,3 +78,18 @@ export const formatDateToISO = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+/**
+ * Splits a variable name using a seperator and returns the words separated by spaces.
+ * 'balls_of_steel' to 'balls of steel'
+ * @param {string} variable - The variable name containing a seperator.
+ * @param {string} separator - The character used to split the variable name.
+ * @returns {string} - The variable name with spaces instead of seperator.
+ */
+export const splitVariables = (variable: string, separator: string): string => {
+  if (!variable) return ''
+
+  const wordsArray = variable.split(separator)
+  const result = wordsArray.join(' ')
+  return result
+}

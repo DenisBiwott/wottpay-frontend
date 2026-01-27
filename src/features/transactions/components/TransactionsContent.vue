@@ -2,8 +2,13 @@
   <div>
     <div class="flex justify-between">
       <h1 class="text-2xl font-normal text-gray-900 mb-6">Transactions & Requests</h1>
-      <!-- Request payment button  -->
-      <Button class="text-sm h-10 cursor-pointer" variant="primary" @click="handleRequest">
+
+      <Button
+        size="sm"
+        class="text-sm h-10 cursor-pointer"
+        variant="primary"
+        @click="handleRequest"
+      >
         <span>Request Payment</span>
         <PlusIcon class="h-4 w-4 ml-2" />
       </Button>

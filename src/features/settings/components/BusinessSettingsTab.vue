@@ -1,27 +1,156 @@
 <template>
-  <div class="py-8">
-    <div class="text-center">
-      <div class="mx-auto h-12 w-12 text-gray-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z"
-          />
-        </svg>
+  <div class="py-6 space-y-8">
+    <!-- Business Name Section -->
+    <section>
+      <h3 class="text-lg text-gray-900 mb-4">Business Information</h3>
+      <div class="bg-white border border-slate-200 rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Business Name</p>
+            <p class="text-sm text-gray-900 mt-2">{{ businessName }}</p>
+          </div>
+        </div>
       </div>
-      <h3 class="mt-4 text-lg font-medium text-gray-900">Business Settings</h3>
-      <p class="mt-2 text-sm text-gray-500">
-        Business configuration options are under development. Check back soon.
-      </p>
-    </div>
+    </section>
+
+    <!-- IPN Webhooks Section -->
+    <section>
+      <div class="flex items-center gap-2 mb-4">
+        <h3 class="text-lg text-gray-900">IPN Webhooks</h3>
+        <div class="relative group">
+          <InfoOutlineIcon class="w-4 h-4 text-gray-400 cursor-help" />
+          <div
+            class="absolute left-0 bottom-full mb-2 w-64 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10"
+          >
+            Instant Payment Notification (IPN) webhooks allow you to receive real-time payment
+            status updates at your specified URL.
+          </div>
+        </div>
+      </div>
+
+      <!-- Register New IPN Form -->
+      <div class="bg-white border border-slate-200 rounded-lg p-4 mb-6">
+        <h4 class="text-sm text-gray-900 mb-3">Register New Webhook</h4>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 mb-4">
+            <TextInput
+              size="sm"
+              class="h-8"
+              id="ipn-url"
+              v-model="newIpnUrl"
+              type="text"
+              label="Webhook URL"
+              @keyup.enter="registerNewIPN"
+            />
+            <p v-if="urlError" class="mt-1 text-sm text-red-500">{{ urlError }}</p>
+          </div>
+          <div class="flex items-center">
+            <Button
+              size="sm"
+              @click="registerNewIPN"
+              :loading="isRegistering"
+              :disabled="isRegistering"
+              class="w-full sm:w-auto"
+            >
+              Register
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <Alert v-if="error" variant="error" class="mb-4">
+        {{ error }}
+        <button @click="clearError" class="ml-2 underline">Dismiss</button>
+      </Alert>
+
+      <!-- Loading State -->
+      <Loader v-if="isLoading" container-class="py-8" />
+
+      <!-- Empty State -->
+      <div v-else-if="isEmpty" class="text-center py-8">
+        <p class="text-sm text-gray-500">No IPN webhooks registered yet.</p>
+      </div>
+
+      <!-- IPNs Table -->
+      <Table v-else>
+        <template #header>
+          <TableCell is-header>URL</TableCell>
+          <TableCell is-header>Notification Type</TableCell>
+          <TableCell is-header>Created</TableCell>
+        </template>
+
+        <template #body>
+          <TableRow v-for="ipn in ipns" :key="ipn.id">
+            <TableCell>
+              <div class="flex items-center gap-2">
+                <span class="text-sm max-w-xs truncate">{{ ipn.url }}</span>
+                <Badge v-if="ipn.id === mostRecentIpnId" variant="success">New</Badge>
+              </div>
+            </TableCell>
+            <TableCell>
+              <span class="text-sm">{{ ipn.notificationType }}</span>
+            </TableCell>
+            <TableCell>
+              <span class="text-sm">{{ formatIpnDate(ipn.createdAt) }}</span>
+            </TableCell>
+          </TableRow>
+        </template>
+
+        <template #mobile>
+          <div
+            v-for="ipn in ipns"
+            :key="ipn.id"
+            class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+          >
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">URL</span>
+                <Badge v-if="ipn.id === mostRecentIpnId" variant="success">New</Badge>
+              </div>
+              <p class="text-sm text-gray-900 truncate">{{ ipn.url }}</p>
+              <div class="flex justify-between pt-2 border-t border-gray-100">
+                <span class="text-sm text-gray-500">Type</span>
+                <span class="text-sm text-gray-900">{{ ipn.notificationType }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Created</span>
+                <span class="text-sm text-gray-900">{{ formatIpnDate(ipn.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </Table>
+    </section>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import {
+  Alert,
+  Button,
+  Loader,
+  TextInput,
+  Table,
+  TableRow,
+  TableCell,
+  Badge,
+} from '@/components/ui'
+import { InfoOutlineIcon } from '@/components/icons'
+import { useBusinessSettings } from '../composables/useBusinessSettings'
+
+const {
+  ipns,
+  isLoading,
+  isRegistering,
+  error,
+  isEmpty,
+  businessName,
+  newIpnUrl,
+  urlError,
+  mostRecentIpnId,
+  registerNewIPN,
+  clearError,
+  formatIpnDate,
+} = useBusinessSettings()
+</script>

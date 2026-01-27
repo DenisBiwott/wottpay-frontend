@@ -4,6 +4,7 @@ import type {
   PaymentRequestFilters,
   CancelPaymentRequest,
   CancelPaymentResponse,
+  PaymentRequestWithTransaction,
 } from '../types/paymentRequests.types'
 
 export async function fetchPaymentRequestsApi(
@@ -29,5 +30,14 @@ export async function cancelPaymentRequestApi(
   data: CancelPaymentRequest,
 ): Promise<CancelPaymentResponse> {
   const response = await apiClient.post<CancelPaymentResponse>('/payments/cancel', data)
+  return response.data
+}
+
+export async function fetchPaymentRequestWithTransactionApi(
+  id: string,
+): Promise<PaymentRequestWithTransaction> {
+  const response = await apiClient.get<PaymentRequestWithTransaction>(
+    `/payments/links/${id}/with-transaction`,
+  )
   return response.data
 }

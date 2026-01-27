@@ -9,8 +9,11 @@
         :redirect-url="request.redirectUrl"
         :can-cancel="canCancel(request.status)"
         :is-cancelling="isCancelling"
+        :is-completed="request.status === 'COMPLETED'"
+        :payment-request-id="request.id"
         @copy-url="copyPaymentUrl(request.redirectUrl)"
         @cancel="cancelRequest(request.trackingId)"
+        @view-details="handleViewDetails(request.id)"
       />
     </div>
 
@@ -57,5 +60,6 @@ defineProps<{
   canCancel: (status: PaymentRequestStatus) => boolean
   copyPaymentUrl: (url: string) => void
   cancelRequest: (trackingId: string) => void
+  handleViewDetails: (paymentRequestId: string) => void
 }>()
 </script>

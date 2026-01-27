@@ -6,6 +6,8 @@ export function useUserProfile() {
   const authStore = useAuthStore()
   const router = useRouter()
 
+  // authStore.fetchAndSetUserProfile()
+
   const user = computed(() => authStore.user)
 
   const userEmail = computed(() => user.value?.email ?? '')

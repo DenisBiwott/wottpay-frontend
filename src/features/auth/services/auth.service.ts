@@ -46,11 +46,8 @@ export async function fetchUserProfileApi() {
 }
 
 // Setup TOTP
-export async function setupTotpApi(email: string, password: string) {
-  const response = await apiClient.post<TotpSetupResponse>('/auth/totp/setup', {
-    email,
-    password,
-  })
+export async function setupTotpApi() {
+  const response = await apiClient.post<TotpSetupResponse>('/auth/totp/setup')
   return response.data
 }
 

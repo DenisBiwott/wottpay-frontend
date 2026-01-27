@@ -9,7 +9,7 @@
       </div>
 
       <!-- Right side: Profile dropdown -->
-      <Dropdown align="right" width="w-56">
+      <Dropdown ref="dropdownRef" align="right" width="w-56">
         <template #trigger>
           <button
             type="button"
@@ -23,7 +23,7 @@
         <!-- Profile header -->
         <div class="px-4 py-3 border-b border-gray-100">
           <p class="text-sm font-medium text-gray-900 truncate">{{ userEmail }}</p>
-          <p class="text-xs text-gray-500 truncate">{{ userRole }}</p>
+          <p class="text-xs text-gray-500 truncate">{{ splitVariables(userRole, '_') }}</p>
         </div>
 
         <!-- Menu items -->
@@ -34,7 +34,7 @@
           Profile
         </DropdownItem>
 
-        <DropdownItem @click="navigateToSettings">
+        <DropdownItem v-if="canManageBusiness" @click="navigateToSettings">
           <template #icon>
             <SettingsIcon class="w-5 h-5" />
           </template>
@@ -55,11 +55,18 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Avatar, Dropdown, DropdownItem } from '@/components/ui'
 import { ChevronDown, UserIcon, SettingsIcon, LogoutIcon } from '@/components/icons'
 import MobileMenuButton from './MobileMenuButton.vue'
 import { useUserProfile } from '@/composables'
 import BusinessSwitcher from './BusinessSwitcher.vue'
+import { useRbac } from '@/core/rbac'
+import { splitVariables } from '@/core/utils/formatting'
+
+const router = useRouter()
+const dropdownRef = ref<InstanceType<typeof Dropdown> | null>(null)
 
 defineProps<{
   isMobileMenuOpen: boolean
@@ -72,10 +79,14 @@ defineEmits<{
 const { userInitials, userEmail, userRole, businessName, handleLogout } = useUserProfile()
 
 function navigateToProfile() {
-  // TODO: Implement profile navigation
+  dropdownRef.value?.close()
+  router.push({ path: '/settings', query: { tab: 'user' } })
 }
 
 function navigateToSettings() {
-  // TODO: Implement settings navigation
+  dropdownRef.value?.close()
+  router.push({ path: '/settings', query: { tab: 'business' } })
 }
+
+const { canManageBusiness } = useRbac()
 </script>
