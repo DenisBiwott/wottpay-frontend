@@ -1,25 +1,49 @@
-// Central Axios instance + Interceptors
+/**
+ * Centralized Axios API Client
+ *
+ * This module provides a configured Axios instance for all API communication.
+ * It handles authentication token management, automatic token refresh on 401
+ * responses, and request queuing during token refresh to prevent race conditions.
+ *
+ * Key features:
+ * - Automatic Bearer token attachment to all requests
+ * - Transparent token refresh when access token expires
+ * - Request queuing during refresh to prevent duplicate refresh calls
+ * - Automatic redirect to login on refresh failure
+ */
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import type { RefreshTokenResponse } from '@/features/auth/types/auth.types'
 import { useAuthStore } from '@/features/auth/store/auth.store'
 
-// Create axios instance
+// Create axios instance with default configuration
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   headers: {
     'Content-Type': 'application/json',
-    // Ngrok specific header to avoid warning page
+    // Ngrok specific header to avoid warning page during development
     'ngrok-skip-browser-warning': 'true',
   },
 })
 
-// Token refresh state
+/**
+ * Token refresh state management.
+ * `isRefreshing` prevents multiple simultaneous refresh requests.
+ * `failedQueue` holds pending requests that arrived during refresh.
+ */
 let isRefreshing = false
 let failedQueue: Array<{
   resolve: (token: string) => void
   reject: (error: unknown) => void
 }> = []
 
+/**
+ * Processes all queued requests after token refresh completes.
+ * If refresh succeeded, resolves queued requests with new token.
+ * If refresh failed, rejects all queued requests with the error.
+ *
+ * @param error - The error if refresh failed, null if successful
+ * @param token - The new access token if refresh succeeded
+ */
 const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((request) => {
     if (error) {
@@ -31,7 +55,13 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = []
 }
 
-// Request interceptor - attach Bearer token
+/**
+ * Request Interceptor
+ *
+ * Attaches the Bearer token to all outgoing requests if available.
+ * The token is retrieved from the auth store on each request to ensure
+ * the latest token is always used.
+ */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const authStore = useAuthStore()
@@ -46,7 +76,21 @@ apiClient.interceptors.request.use(
   },
 )
 
-// Response interceptor - handle 401 errors and token refresh
+/**
+ * Response Interceptor
+ *
+ * Handles 401 Unauthorized responses by attempting token refresh.
+ *
+ * Flow:
+ * 1. On 401 response, check if this is already a retry (via `_retry` flag)
+ * 2. If refresh is already in progress, queue the request
+ * 3. Otherwise, initiate token refresh
+ * 4. On successful refresh, retry the original request with new token
+ * 5. On refresh failure, clear auth state and redirect to login
+ *
+ * The `_retry` flag on the request config prevents infinite retry loops
+ * when the refreshed token is also invalid.
+ */
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -59,19 +103,19 @@ apiClient.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    // Don't retry refresh token requests
+    // Don't retry refresh token requests - this would cause infinite loop
     if (originalRequest.url?.includes('/auth/refresh')) {
       clearAuthData()
       window.location.href = '/login'
       return Promise.reject(error)
     }
 
-    // Don't retry if already retried
+    // Prevent infinite retry loop with the _retry flag
     if (originalRequest._retry) {
       return Promise.reject(error)
     }
 
-    // If already refreshing, queue this request
+    // If already refreshing, queue this request to retry after refresh completes
     if (isRefreshing) {
       return new Promise<string>((resolve, reject) => {
         failedQueue.push({ resolve, reject })
@@ -87,6 +131,7 @@ apiClient.interceptors.response.use(
         })
     }
 
+    // Mark this request as a retry attempt
     originalRequest._retry = true
     isRefreshing = true
 
@@ -101,6 +146,7 @@ apiClient.interceptors.response.use(
     }
 
     try {
+      // Attempt to refresh the access token
       const response = await axios.post<RefreshTokenResponse>(
         `${import.meta.env.VITE_API_BASE_URL || '/api'}/auth/refresh`,
         { refreshToken },
@@ -113,10 +159,12 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
       }
 
+      // Process all queued requests with the new token
       processQueue(null, newAccessToken)
 
       return apiClient(originalRequest)
     } catch (refreshError) {
+      // Refresh failed - reject all queued requests and redirect to login
       processQueue(refreshError, null)
       clearAuthData()
       window.location.href = '/login'
@@ -127,6 +175,10 @@ apiClient.interceptors.response.use(
   },
 )
 
+/**
+ * Clears all authentication data from the store.
+ * Called when token refresh fails or user session is invalid.
+ */
 function clearAuthData() {
   const authStore = useAuthStore()
   authStore.clearAuthState()
