@@ -2,14 +2,12 @@
   <!-- Desktop Table -->
   <Table class="hidden md:block">
     <template #header>
-      <TableRow is-header>
-        <TableCell is-header>Date</TableCell>
-        <TableCell is-header>Description</TableCell>
-        <TableCell is-header>Reference</TableCell>
-        <TableCell is-header>Amount</TableCell>
-        <TableCell is-header>Currency</TableCell>
-        <TableCell is-header>Status</TableCell>
-      </TableRow>
+      <TableCell is-header>Date</TableCell>
+      <TableCell is-header>Description</TableCell>
+      <TableCell is-header>Reference</TableCell>
+      <TableCell is-header>Amount</TableCell>
+      <TableCell is-header>Currency</TableCell>
+      <TableCell is-header>Status</TableCell>
     </template>
 
     <template #body>
@@ -52,7 +50,9 @@ import type { Transaction, TransactionStatusCode } from '../types/transactions.t
 defineProps<{
   transactions: Transaction[]
   getStatusLabel: (status: TransactionStatusCode) => string
-  getStatusVariant: (status: TransactionStatusCode) => 'success' | 'warning' | 'error' | 'info' | 'default'
+  getStatusVariant: (
+    status: TransactionStatusCode,
+  ) => 'success' | 'warning' | 'error' | 'info' | 'default'
   formatCurrency: (amount: number, currency: string) => string
   formatDate: (date: string) => string
 }>()
