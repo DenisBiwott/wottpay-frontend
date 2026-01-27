@@ -67,9 +67,10 @@ const localFilters = reactive<{
 }>({
   status: props.filters.status !== undefined ? String(props.filters.status) : '',
   // startDate: First day of the month
-  startDate: props.filters.startDate || new Date(new Date().setDate(1)).toISOString().split('T')[0],
+  startDate:
+    props.filters.startDate || new Date(new Date().setDate(1)).toISOString().split('T')[0] || '',
   // endDate: Today
-  endDate: props.filters.endDate || new Date().toISOString().split('T')[0],
+  endDate: props.filters.endDate || new Date().toISOString().split('T')[0] || '',
 })
 
 watch(

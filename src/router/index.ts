@@ -1,3 +1,12 @@
+/**
+ * Vue Router Configuration
+ *
+ * This module defines the application's routing structure. Each route specifies:
+ * - `meta.layout`: Determines which layout component wraps the view (see App.vue)
+ * - `meta.requiresAuth`: Whether the route requires authentication
+ *
+ * The authGuard is registered globally and checks requiresAuth on navigation.
+ */
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import TotpVerificationView from '@/views/TotpVerificationView.vue'
@@ -8,6 +17,18 @@ import SettingsView from '@/views/SettingsView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { authGuard } from '@/core/guards/auth.guard'
 
+/**
+ * Route Definitions
+ *
+ * Layout options:
+ * - 'AuthLayout': Minimal layout for authentication pages (login, TOTP)
+ * - 'DefaultLayout': Full app layout with sidebar navigation
+ * - 'PaymentLayout': Streamlined layout for payment creation flow
+ *
+ * Authentication:
+ * - requiresAuth: true - User must be logged in (redirects to /login if not)
+ * - requiresAuth: false - Public route (login redirects away if authenticated)
+ */
 const routes = [
   {
     path: '/',
@@ -79,7 +100,7 @@ const router = createRouter({
   routes,
 })
 
-// Register auth guard
+// Register global navigation guard for authentication
 router.beforeEach(authGuard)
 
 export default router

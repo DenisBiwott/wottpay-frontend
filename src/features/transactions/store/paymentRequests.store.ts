@@ -65,7 +65,7 @@ export const usePaymentRequestsStore = defineStore('paymentRequests', () => {
       // Update the local state to reflect the cancelled status
       const request = paymentRequests.value.find((pr) => pr.trackingId === orderTrackingId)
       if (request) {
-        request.status = 'CANCELLED'
+        request.status = 'RECALLED'
       }
 
       return data
