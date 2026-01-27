@@ -3,7 +3,7 @@
   <Table class="hidden md:block">
     <template #header>
       <TableCell is-header>Date</TableCell>
-      <TableCell is-header>Description</TableCell>
+      <TableCell is-header>Channel</TableCell>
       <TableCell is-header>Reference</TableCell>
       <TableCell is-header>Amount</TableCell>
       <TableCell is-header>Currency</TableCell>
@@ -13,15 +13,15 @@
     <template #body>
       <TableRow v-for="transaction in transactions" :key="transaction.id">
         <TableCell>{{ formatDate(transaction.createdAt) }}</TableCell>
-        <TableCell>{{ transaction.description }}</TableCell>
-        <TableCell class="font-mono text-sm">{{ transaction.reference }}</TableCell>
+        <TableCell>{{ transaction.paymentMethod }}</TableCell>
+        <TableCell class="font-mono text-sm">{{ transaction.confirmationCode }}</TableCell>
         <TableCell class="font-semibold">
           {{ formatCurrency(transaction.amount, transaction.currency) }}
         </TableCell>
         <TableCell>{{ transaction.currency }}</TableCell>
         <TableCell>
-          <Badge :variant="getStatusVariant(transaction.status)">
-            {{ getStatusLabel(transaction.status) }}
+          <Badge :variant="getStatusVariant(transaction.statusCode)">
+            {{ getStatusLabel(transaction.statusCode) }}
           </Badge>
         </TableCell>
       </TableRow>

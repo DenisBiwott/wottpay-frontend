@@ -43,7 +43,7 @@
 
         <div class="border-t border-gray-100 my-1"></div>
 
-        <DropdownItem @click="handleLogout">
+        <DropdownItem @click="logout">
           <template #icon>
             <LogoutIcon class="w-5 h-5" />
           </template>
@@ -77,6 +77,11 @@ defineEmits<{
 }>()
 
 const { userInitials, userEmail, userRole, businessName, handleLogout } = useUserProfile()
+
+function logout() {
+  dropdownRef.value?.close()
+  handleLogout()
+}
 
 function navigateToProfile() {
   dropdownRef.value?.close()
