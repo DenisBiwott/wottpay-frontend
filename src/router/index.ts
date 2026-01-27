@@ -3,6 +3,8 @@ import LoginView from '@/views/LoginView.vue'
 import TotpVerificationView from '@/views/TotpVerificationView.vue'
 import PaymentView from '@/views/PaymentView.vue'
 import TransasctionsView from '@/views/TransasctionsView.vue'
+import PeopleView from '@/views/PeopleView.vue'
+import SettingsView from '@/views/SettingsView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { authGuard } from '@/core/guards/auth.guard'
 
@@ -47,6 +49,24 @@ const routes = [
     path: '/transactions',
     name: 'transactions',
     component: TransasctionsView,
+    meta: {
+      layout: 'DefaultLayout',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/people',
+    name: 'people',
+    component: PeopleView,
+    meta: {
+      layout: 'DefaultLayout',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: SettingsView,
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,

@@ -23,18 +23,32 @@
             <PaymentsIcon />
           </template>
         </SidebarNavItem>
+
+        <SidebarNavItem v-if="canViewUsers" :to="{ name: 'people' }" label="People">
+          <template #icon>
+            <UsersIcon />
+          </template>
+        </SidebarNavItem>
+
+        <SidebarNavItem :to="{ name: 'settings' }" label="Settings">
+          <template #icon>
+            <SettingsIcon />
+          </template>
+        </SidebarNavItem>
       </nav>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { HomeIcon, PaymentsIcon } from '@/components/icons'
-import BusinessSwitcher from './BusinessSwitcher.vue'
+import { HomeIcon, PaymentsIcon, UsersIcon, SettingsIcon } from '@/components/icons'
 import SidebarNavItem from './SidebarNavItem.vue'
+import { useRbac } from '@/core/rbac'
 
 defineProps<{
   isOpen: boolean
   businessName: string
 }>()
+
+const { canViewUsers } = useRbac()
 </script>

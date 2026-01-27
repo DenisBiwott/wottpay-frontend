@@ -1,5 +1,5 @@
 <template>
-  <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
+  <header class="sticky top-0 bg-white border-b border-slate-200 z-60">
     <div class="flex items-center justify-between h-16 px-4 sm:pr-6">
       <!-- Left side: Mobile menu button + Logo -->
       <div class="flex items-center gap-4">
