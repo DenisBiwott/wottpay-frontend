@@ -91,7 +91,7 @@ export function usePaymentRequestCreation() {
           lastName: form.value.lastName || undefined,
         },
         businessId: businessId.value,
-        callbackUrl: import.meta.env.VITE_API_BASE_URL,
+        callbackUrl: import.meta.env?.VITE_API_BASE_URL || 'https://pay.denisbiwott.com/api/',
         notificationId: ipn.ipnId,
       }
 
